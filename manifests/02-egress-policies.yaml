@@ -1,0 +1,44 @@
+# Policy 1 selects every pod in tenant-a and turns on egress isolation.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-egress
+  namespace: tenant-a
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+---
+# Policy 2 restores only the two flows needed by the lab:
+# 1. DNS to CoreDNS over UDP/TCP 53.
+# 2. HTTP to app=web pods in the same namespace over TCP 80.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-and-api-only
+  namespace: tenant-a
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app: web
+      ports:
+        - protocol: TCP
+          port: 80
+

@@ -1,0 +1,21 @@
+# NEGATIVE TEST ONLY
+# This updates allow-dns-and-api-only and intentionally removes the DNS rule.
+# Reapply 02-egress-policies.yaml immediately after recording the failure.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-and-api-only
+  namespace: tenant-a
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: web
+      ports:
+        - protocol: TCP
+          port: 80
+

@@ -1,0 +1,24 @@
+# TEMPORARY BASELINE POLICY
+# The original Lab 2 default-deny ingress is already active in tenant-b.
+# This rule narrowly permits tenant-a to reach tenant-b's app=web pods on TCP 80
+# so the later test can isolate the effect of egress filtering.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-tenant-a-to-api
+  namespace: tenant-b
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tenant-a
+      ports:
+        - protocol: TCP
+          port: 80
+

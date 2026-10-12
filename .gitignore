@@ -1,0 +1,7 @@
+*.eml
+*.docx
+*.pdf
+.env*
+*.pem
+private-source-reports/
+work/
